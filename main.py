@@ -14,20 +14,20 @@ class MainWindow:
         
         window.title("pyCheckers")
         window.geometry(f'{window_height}x{window_width}+{center_x}+{center_y}')
-
+        self.board = Board(window)
 
     def run(self):
-        self.board()
         self.window.mainloop()
 
-#Draw the board
-    def board(self):
-        board = tk.Canvas(self.window, borderwidth=1)   
-        board.grid(row = 1, column = 0, sticky = "ew", columnspan= 8, rowspan= 8)
+class Board:
+    def __init__(self, window):
+        self.board = tk.Canvas(window, borderwidth=1)
+        self.board.grid(row = 1, column = 0, sticky = "ew", columnspan= 8, rowspan= 8)
+        self.draw_board()
+
+    def draw_board(self):
         row = 8
         col = 8
-        i = 0
-        j = 0
         x = 30
         y = 30
         for j in range(col):
@@ -37,18 +37,16 @@ class MainWindow:
                     if(i % 2 == 0):
                         #first two numbers for argument are coordinates at top left and rest on px after bottom right 
                         # https://web.archive.org/web/20181223164027/http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/create_rectangle.html
-                        board.create_rectangle(i * x,j * y,(i + 1) * x,(j + 1) *y,fill='black')
-                    else:
-                        board.create_rectangle(i * x,j * y,(i + 1) * x,(j + 1) *y,fill='white')
+                        self.board.create_rectangle(i * x,j * y,(i + 1) * x,(j + 1) * y,fill='black')
+                    else:   
+                        self.board.create_rectangle(i * x,j * y,(i + 1) * x,(j + 1) *y,fill='white')
             else:
                 for i in range(row):
                     #pair number
                     if(i % 2 == 0):
-                        board.create_rectangle(i * x,j * y,(i + 1) * x,(j + 1) *y,fill='white')
+                        self.board.create_rectangle(i * x,j * y,(i + 1) * x,(j + 1) *y,fill='white')
                     else:
-                        board.create_rectangle(i * x,j * y,(i + 1) * x,(j + 1) *y,fill='black')
-
-
+                        self.board.create_rectangle(i * x,j * y,(i + 1) * x,(j + 1) *y,fill='black')
 
 #Create the window and let it run until user quits 
 root = tk.Tk()
