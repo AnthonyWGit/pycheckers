@@ -11,10 +11,11 @@ class MainWindow:
         #center of screen
         center_x = int(screen_width/2 - window_width / 2)
         center_y = int(screen_height/2 - window_height / 2)
-        
         window.title("pyCheckers")
         window.geometry(f'{window_height}x{window_width}+{center_x}+{center_y}')
         self.board = Board(window)
+        self.button = tk.Button(window, text="Debug", command=self.board.log_debug)
+        self.button.grid(row=20, column=2)
 
     def run(self):
         self.window.mainloop()
@@ -29,10 +30,27 @@ class Board:
         self.col = 8
         self.x = 30
         self.y = 30
+        self.cells = [[Cell(i, j) for j in range(8)] for i in range(8)]
         self.draw_board()
 
     def start_place_pawns(self):
-        print('Hi')
+        for j in range(self.col):
+            if (j % 2 == 0):
+                for i in range(self.row):
+                    #pair number
+                    if(i % 2 == 0):
+                        #first two numbers for argument are coordinates at top left and rest on px after bottom right 
+                        # https://web.archive.org/web/20181223164027/http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/create_rectangle.html
+                        self.board.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) * self.y,fill='black')
+                    else:   
+                        self.board.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='white')
+            else:
+                for i in range(self.row):
+                    #pair number
+                    if(i % 2 == 0):
+                        self.board.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='white')
+                    else:
+                        self.board.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='black')
 
     def draw_board(self):
         for j in range(self.col):
@@ -53,12 +71,20 @@ class Board:
                     else:
                         self.board.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='black')
 
+    #In GUI environnement it will print adresses so we will need __repr__ or __str__ in Cell class
+    def log_debug(self):
+        print(self.cells)
+    
 class Cell:
-    def __init__(self):
+    def __init__(self, x, y):
         #coordinates
         self.x = x
         self.y = y
         self.free = True
+
+    def __repr__(self):
+        return f"Cell at ({self.x}, {self.y}), free: {self.free}"
+
 class Pawn:
     def __init__(self):
         self.pox = pox
