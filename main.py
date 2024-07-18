@@ -14,8 +14,10 @@ class MainWindow:
         window.title("pyCheckers")
         window.geometry(f'{window_height}x{window_width}+{center_x}+{center_y}')
         self.board = Board(window)
-        self.button = tk.Button(window, text="Debug", command=self.board.log_debug)
+        self.button = tk.Button(window, text="Debug cells", command=self.board.log_debug_cells)
         self.button.grid(row=20, column=2)
+        self.button = tk.Button(window, text="Debug Pawns", command=self.board.log_debug_pawns)
+        self.button.grid(row=20, column=3)
 
     def run(self):
         self.window.mainloop()
@@ -31,6 +33,7 @@ class Board:
         self.x = 30
         self.y = 30
         self.cells = [[Cell(i, j) for j in range(8)] for i in range(8)]
+        self.pawns = []
         self.draw_board()
         self.start_place_pawns()
 
@@ -41,7 +44,12 @@ class Board:
                     if (j % 2 == 0):
                         for i in range(self.row):
                             if (i % 2 == 0):
+                                #Drawning : keep in mind pawn is not yet created 
                                 self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='white')
+                                #Create a pawn 
+                                pawn = Pawn('white', i, j)
+                                self.cells[i][j].pawned = pawn
+                                self.pawns.append(pawn)
                     else:
                         for i in range(self.row):
                             if (i % 2 != 0):
@@ -67,17 +75,20 @@ class Board:
                     else:
                         self.board.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='black')
 
-    #In GUI environnement it will print adresses so we will need __repr__ or __str__ in Cell class
-    def log_debug(self):
+    #In GUI environnement it will print adresses so we will need __repr__ or __str__ in Cell/ whatever class
+    def log_debug_cells(self):
         print(self.cells)
     
+    def log_debug_pawns(self):
+        print(self.pawns)
+
 class Cell:
     def __init__(self, x, y):
         #coordinates
         self.x = x
         self.y = y
         self.free = True
-        self.pawned = None
+        self.pawned = None #Will tell if there is a pawn at this pos or not 
 
     def __repr__(self):
         return f"Cell at ({self.x}, {self.y}), free: {self.free}"
@@ -86,7 +97,10 @@ class Pawn:
     def __init__(self, color, x ,y):
         self.color = color
         self.x = x
-        self.y = y 
+        self.y = y
+
+    def __repr__(self):
+        return f"Pawn at ({self.x}, {self.y}), color: {self.color}"
 
 #Create the window and let it run until user quits 
 root = tk.Tk()
