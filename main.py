@@ -83,7 +83,7 @@ class Cell:
         return f"Cell at ({self.x}, {self.y}), free: {self.free}"
 
 class Pawn:
-    def __init__(self):
+    def __init__(self, color, x ,y):
         self.color = color
         self.x = x
         self.y = y 
