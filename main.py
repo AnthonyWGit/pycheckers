@@ -21,7 +21,9 @@ class MainWindow:
 
 class Board:
     def __init__(self, window):
+        #bord is a Canvas widget from Tkinter class
         self.board = tk.Canvas(window, borderwidth=1)
+        #Drawing the grid
         self.board.grid(row = 1, column = 0, sticky = "ew", columnspan= 8, rowspan= 8)
         self.draw_board()
 
@@ -47,6 +49,14 @@ class Board:
                         self.board.create_rectangle(i * x,j * y,(i + 1) * x,(j + 1) *y,fill='white')
                     else:
                         self.board.create_rectangle(i * x,j * y,(i + 1) * x,(j + 1) *y,fill='black')
+
+class Cell:
+    def __init__(self):
+        
+        pass
+class Pawn:
+    def __init__(self):
+
 
 #Create the window and let it run until user quits 
 root = tk.Tk()
