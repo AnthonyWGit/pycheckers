@@ -34,23 +34,14 @@ class Board:
         self.draw_board()
 
     def start_place_pawns(self):
-        for j in range(self.col):
+        for j in range(1):
             if (j % 2 == 0):
                 for i in range(self.row):
                     #pair number
-                    if(i % 2 == 0):
-                        #first two numbers for argument are coordinates at top left and rest on px after bottom right 
-                        # https://web.archive.org/web/20181223164027/http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/create_rectangle.html
-                        self.board.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) * self.y,fill='black')
-                    else:   
-                        self.board.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='white')
+
             else:
                 for i in range(self.row):
                     #pair number
-                    if(i % 2 == 0):
-                        self.board.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='white')
-                    else:
-                        self.board.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='black')
 
     def draw_board(self):
         for j in range(self.col):
@@ -87,7 +78,9 @@ class Cell:
 
 class Pawn:
     def __init__(self):
-        self.pox = pox
+        self.color = color
+        self.x = x
+        self.y = y 
 
 #Create the window and let it run until user quits 
 root = tk.Tk()
