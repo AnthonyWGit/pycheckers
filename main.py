@@ -45,15 +45,35 @@ class Board:
                         for i in range(self.row):
                             if (i % 2 == 0):
                                 #Drawning : keep in mind pawn is not yet created 
-                                self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='white')
+                                #This id refers the object created by TkInter Canvas 
+                                id = self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='white')
                                 #Create a pawn 
-                                pawn = Pawn('white', i, j)
+                                pawn = Pawn('white', i, j, id)
                                 self.cells[i][j].pawned = pawn
                                 self.pawns.append(pawn)
                     else:
                         for i in range(self.row):
                             if (i % 2 != 0):
                                 self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='white')
+                                pawn = Pawn('white', i, j, id)
+                                self.cells[i][j].pawned = pawn
+                                self.pawns.append(pawn)
+                elif( 5 <= j <= 7):
+                    if (j % 2 != 0):
+                        for i in range(self.row):
+                            if (i % 2 == 0):
+                                id = self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='black')
+                                #Create a pawn 
+                                pawn = Pawn('black', i, j, id)
+                                self.cells[i][j].pawned = pawn
+                                self.pawns.append(pawn)
+                    else:
+                        for i in range(self.row):
+                            if (i % 2 != 0):
+                                self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='black')
+                                pawn = Pawn('black', i, j, id)
+                                self.cells[i][j].pawned = pawn
+                                self.pawns.append(pawn)
 
 
     def draw_board(self):
@@ -94,13 +114,14 @@ class Cell:
         return f"Cell at ({self.x}, {self.y}), free: {self.free}"
 
 class Pawn:
-    def __init__(self, color, x ,y):
+    def __init__(self, color, x ,y, id=None):
         self.color = color
         self.x = x
         self.y = y
+        self.id = id #Imagine this is chess there are lots of two pieces and there is a notation of each piece 
 
     def __repr__(self):
-        return f"Pawn at ({self.x}, {self.y}), color: {self.color}"
+        return f"Pawn at ({self.x}, {self.y}), color: {self.color}, id: {self.id}."
 
 #Create the window and let it run until user quits 
 root = tk.Tk()
