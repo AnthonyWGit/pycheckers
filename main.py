@@ -32,16 +32,21 @@ class Board:
         self.y = 30
         self.cells = [[Cell(i, j) for j in range(8)] for i in range(8)]
         self.draw_board()
+        self.start_place_pawns()
 
+    #EN checkers so 8*8 board and 3*3 rows of pawns
     def start_place_pawns(self):
-        for j in range(1):
-            if (j % 2 == 0):
-                for i in range(self.row):
-                    #pair number
+        for j in range(self.col):
+                if (j < 3): # 0-1-2
+                    if (j % 2 == 0):
+                        for i in range(self.row):
+                            if (i % 2 == 0):
+                                self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='white')
+                    else:
+                        for i in range(self.row):
+                            if (i % 2 != 0):
+                                self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='white')
 
-            else:
-                for i in range(self.row):
-                    #pair number
 
     def draw_board(self):
         for j in range(self.col):
@@ -72,6 +77,7 @@ class Cell:
         self.x = x
         self.y = y
         self.free = True
+        self.pawned = None
 
     def __repr__(self):
         return f"Cell at ({self.x}, {self.y}), free: {self.free}"
