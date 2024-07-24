@@ -159,7 +159,6 @@ class Game(MainWindow):
     def select_pawn(self):
         #when Whites turn
         if (self.board.turn % 2 ==  0):
-            self.board.turn += 1
             print(self.board.turn)
             #change label anouncing player turn 
             print(self.last_clicked_cell, 'fzerze')
@@ -210,6 +209,9 @@ class Game(MainWindow):
                 self.selected_pawn.x = self.pawn_current_pos.x
                 self.selected_pawn.y = self.pawn_current_pos.y
                 self.move_pawn(self.selected_pawn, self.pawn_current_pos.x, self.pawn_current_pos.y)
+
+                #when everything is good increase turn count
+                self.board.turn += 1
 
     def movement_is_valid(self):
         #check if white movement is correct
