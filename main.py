@@ -24,27 +24,15 @@ class MainWindow:
         self.button.grid(row=11, column=0)
         self.button = tk.Button(window, text="Debug Pawns", command=self.board.log_debug_pawns)
         self.button.grid(row=11, column=1)
-        self.game_flow()
-
-    def game_flow(self):
-        if (self.board.turn % 2 ==  0):
-                print(self.window)
-                print(self.board.turn)
-                self.player_color_turn.config(text="White turn")
-                # if self.board.on_click() == 
-        else:
-                self.player_color_turn.config(text="Blacks turn")
-
-    def run(self):
-        self.window.mainloop()
 
 class Board:
     def __init__(self, window):
         #bord is a Canvas widget from Tkinter class
-        self.board = tk.Canvas(window, borderwidth=1)
+        self.canvas = tk.Canvas(window, borderwidth=1)
         self.window = window
+        self.last_clicked_cell = None
         #Drawing the grid
-        self.board.grid(row = 3, column = 0, sticky = "ew", columnspan= 8, rowspan= 8)
+        self.canvas.grid(row = 3, column = 0, sticky = "ew", columnspan= 8, rowspan= 8)
         self.row = 8
         self.col = 8
         #x and y size of square
@@ -53,20 +41,8 @@ class Board:
         self.turn = 0
         self.cells = [[Cell(i, j) for j in range(8)] for i in range(8)]
         self.pawns = []
-        self.board.bind("<Button-1>", self.on_click)  # Bind left mouse click event
         self.draw_board()
         self.start_place_pawns()
-
-    # get x and y pos in the canvas 
-    def on_click(self, event):
-        # remove the whole division // and you will get the position in pixels where you click ! 
-        # using floor division so no we get an integer and not a float  
-        cell_x = event.x // self.x 
-        cell_y = event.y // self.y 
-        # Now you can use these coordinates to move the pawn
-        clicked_cell = self.cells[cell_x][cell_y]
-        print(f"Clicked on cell ({cell_x}, {cell_y},{clicked_cell})")
-        print(clicked_cell.__dict__)
 
     #EN checkers so 8*8 board and 3*3 rows of pawns
     def start_place_pawns(self):
@@ -77,7 +53,7 @@ class Board:
                             if (i % 2 != 0):
                                 #Drawning : keep in mind pawn is not yet created 
                                 #This id refers the object created by TkInter Canvas 
-                                id = self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='black')
+                                id = self.canvas.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='black')
                                 #Create a pawn 
                                 pawn = Pawn('black', i, j, id)
                                 self.cells[i][j].pawned = pawn
@@ -86,7 +62,7 @@ class Board:
                     else:
                         for i in range(self.row):
                             if (i % 2 == 0):
-                                self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='black')
+                                self.canvas.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='black')
                                 pawn = Pawn('black', i, j, id)
                                 self.cells[i][j].pawned = pawn
                                 self.pawns.append(pawn)
@@ -95,7 +71,7 @@ class Board:
                     if (j % 2 != 0):
                         for i in range(self.row):
                             if (i % 2 != 0):
-                                id = self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='white')
+                                id = self.canvas.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='white')
                                 #Create a pawn 
                                 pawn = Pawn('white', i, j, id)
                                 self.cells[i][j].pawned = pawn
@@ -104,7 +80,7 @@ class Board:
                     else:
                         for i in range(self.row):
                             if (i % 2 == 0):
-                                self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='white')
+                                self.canvas.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='white')
                                 pawn = Pawn('white', i, j, id)
                                 self.cells[i][j].pawned = pawn
                                 self.pawns.append(pawn)
@@ -118,16 +94,16 @@ class Board:
                     if(i % 2 == 0):
                         #first two numbers for argument are coordinates at top left and rest on px after bottom right 
                         # https://web.archive.org/web/20181223164027/http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/create_rectangle.html
-                        self.board.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) * self.y,fill='black')
+                        self.canvas.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) * self.y,fill='black')
                     else:   
-                        self.board.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='white')
+                        self.canvas.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='white')
             else:
                 for i in range(self.row):
                     #pair number
                     if(i % 2 == 0):
-                        self.board.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='white')
+                        self.canvas.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='white')
                     else:
-                        self.board.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='black')
+                        self.canvas.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='black')
     
     #In GUI environnement it will print adresses so we will need __repr__ or __str__ in Cell/ whatever class
     def log_debug_cells(self):
@@ -167,9 +143,45 @@ class Pawn:
     def __repr__(self):
         return f"Pawn at ({self.x}, {self.y}), color: {self.color}, id: {self.id}."
 
+class Game(MainWindow):
+    def __init__(self, window):
+        super().__init__(window)  # Call the constructor of MainWindow
+        self.waiting = True
+        self.board.canvas.bind("<Button-1>", self.on_click)  # Bind left mouse click event
+
+    def run(self):
+        self.game_flow()
+        self.window.mainloop()
+
+    def game_flow(self):
+        if (self.board.turn % 2 ==  0):
+            print(self.window)
+            print(self.board.turn)
+            self.player_color_turn.config(text="White turn")
+            print(self.board.last_clicked_cell)
+            if (self.board.last_clicked_cell and self.board.last_clicked_cell.free == True):
+                print('b')
+            else:
+                print('a')
+        else:
+            self.player_color_turn.config(text="Blacks turn")
+
+        # get x and y pos in the canvas 
+    def on_click(self, event):
+        # remove the whole division // and you will get the position in pixels where you click ! 
+        # using floor division so no we get an integer and not a float  
+        cell_x = event.x // self.board.x 
+        cell_y = event.y // self.board.y 
+        # Now you can use these coordinates to move the pawn
+        clicked_cell = self.board.cells[cell_x][cell_y]
+        print(f"Clicked on cell ({cell_x}, {cell_y},{clicked_cell}) Turn : {self.board.turn}")
+        self.last_clicked_cell = clicked_cell
+        self.board.turn += 1
+        return(self.last_clicked_cell)
+
+
 #Create the window and let it run until user quits 
 root = tk.Tk()
-my_window = MainWindow(root)
-my_window.run()
-
+my_game = Game(root)
+my_game.run()
 
