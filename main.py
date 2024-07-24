@@ -32,6 +32,7 @@ class Board:
         self.col = 8
         self.x = 30
         self.y = 30
+        self.turn = 0
         self.cells = [[Cell(i, j) for j in range(8)] for i in range(8)]
         self.pawns = []
         self.draw_board()
@@ -74,7 +75,6 @@ class Board:
                                 pawn = Pawn('black', i, j, id)
                                 self.cells[i][j].pawned = pawn
                                 self.pawns.append(pawn)
-
 
     def draw_board(self):
         for j in range(self.col):
@@ -120,6 +120,16 @@ class Pawn:
         self.y = y
         self.id = id #Imagine this is chess there are lots of two pieces and there is a notation of each piece 
 
+    def moving_forward(self): #Not complete and not functional, the idea is to retrieve where user clicks and move whithe to bottom of board 
+        #and blacks up
+        if (self.color == "white"):
+            self.x = x + 1
+            self.y = y + 1
+        
+        if (self.color == "black"):
+            self.x = x - 1
+            self.y = y - 1
+            
     def __repr__(self):
         return f"Pawn at ({self.x}, {self.y}), color: {self.color}, id: {self.id}."
 
