@@ -30,13 +30,24 @@ class Board:
         self.board.grid(row = 1, column = 0, sticky = "ew", columnspan= 8, rowspan= 8)
         self.row = 8
         self.col = 8
+        #x and y size of square
         self.x = 30
         self.y = 30
         self.turn = 0
         self.cells = [[Cell(i, j) for j in range(8)] for i in range(8)]
         self.pawns = []
+        self.board.bind("<Button-1>", self.on_click)  # Bind left mouse click event
         self.draw_board()
         self.start_place_pawns()
+
+    # get x and y pos in the canvas 
+    def on_click(self, event):
+        # remove the whole division // and you will get the position in pixels where you click ! 
+        # using floor division so no we get an integer and not a float  
+        cell_x = event.x // self.x 
+        cell_y = event.y // self.y 
+        print(f"Clicked on cell ({cell_x}, {cell_y})")
+        # Now you can use these coordinates to move the pawn
 
     #EN checkers so 8*8 board and 3*3 rows of pawns
     def start_place_pawns(self):
