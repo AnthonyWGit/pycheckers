@@ -31,7 +31,7 @@ class MainWindow:
                 print(self.window)
                 print(self.board.turn)
                 self.player_color_turn.config(text="White turn")
-                if self.board.on_click() == 
+                # if self.board.on_click() == 
         else:
                 self.player_color_turn.config(text="Blacks turn")
 
@@ -63,8 +63,10 @@ class Board:
         # using floor division so no we get an integer and not a float  
         cell_x = event.x // self.x 
         cell_y = event.y // self.y 
-        print(f"Clicked on cell ({cell_x}, {cell_y})")
         # Now you can use these coordinates to move the pawn
+        clicked_cell = self.cells[cell_x][cell_y]
+        print(f"Clicked on cell ({cell_x}, {cell_y},{clicked_cell})")
+        print(clicked_cell.__dict__)
 
     #EN checkers so 8*8 board and 3*3 rows of pawns
     def start_place_pawns(self):
@@ -80,6 +82,7 @@ class Board:
                                 pawn = Pawn('black', i, j, id)
                                 self.cells[i][j].pawned = pawn
                                 self.pawns.append(pawn)
+                                self.cells[i][j].free = False
                     else:
                         for i in range(self.row):
                             if (i % 2 == 0):
@@ -87,6 +90,7 @@ class Board:
                                 pawn = Pawn('black', i, j, id)
                                 self.cells[i][j].pawned = pawn
                                 self.pawns.append(pawn)
+                                self.cells[i][j].free = False
                 elif( 5 <= j <= 7):
                     if (j % 2 != 0):
                         for i in range(self.row):
@@ -96,6 +100,7 @@ class Board:
                                 pawn = Pawn('white', i, j, id)
                                 self.cells[i][j].pawned = pawn
                                 self.pawns.append(pawn)
+                                self.cells[i][j].free = False
                     else:
                         for i in range(self.row):
                             if (i % 2 == 0):
@@ -103,6 +108,7 @@ class Board:
                                 pawn = Pawn('white', i, j, id)
                                 self.cells[i][j].pawned = pawn
                                 self.pawns.append(pawn)
+                                self.cells[i][j].free = False
 
     def draw_board(self):
         for j in range(self.col):
@@ -151,12 +157,12 @@ class Pawn:
     def moving_forward(self): #Not complete and not functional, the idea is to retrieve where user clicks and move whithe to top of board 
         #and blacks bot
         if (self.color == "white"):
-            self.x = x - 1
-            self.y = y - 1
+            x = x - 1
+            y = y - 1
         
         if (self.color == "black"):
-            self.x = x + 1
-            self.y = y + 1
+            x = x + 1
+            y = y + 1
             
     def __repr__(self):
         return f"Pawn at ({self.x}, {self.y}), color: {self.color}, id: {self.id}."
