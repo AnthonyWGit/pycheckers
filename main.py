@@ -217,18 +217,17 @@ class Game(MainWindow):
                 old_cell.pawned = None
                 print(f'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD {self.board.cells} DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD')
                 # Update the pawn's position --> BROKEN they erase the coordinates of the cell
-                self.pawn_current_pos.x = self.pawn_new_pos.x
-                self.pawn_current_pos.y = self.pawn_new_pos.y
+                self.selected_pawn.x = self.last_clicked_cell.x
+                self.selected_pawn.y = self.last_clicked_cell.y
                 # Get the new cell
                 print(f'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP{self.board.cells} DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD')
-                new_cell = self.board.cells[self.pawn_current_pos.x][self.pawn_current_pos.y]
+                # Get the new cell
+                new_cell = self.board.cells[self.last_clicked_cell.x][self.last_clicked_cell.y]
                 # Update the new cell
                 new_cell.free = False
                 new_cell.pawned = self.selected_pawn
 
-                self.selected_pawn.x = self.pawn_current_pos.x
-                self.selected_pawn.y = self.pawn_current_pos.y
-                self.move_pawn(self.selected_pawn, self.pawn_current_pos.x, self.pawn_current_pos.y)
+                self.move_pawn(self.selected_pawn, self.selected_pawn.x, self.selected_pawn.y)
                 
                 print(f'graphic movement {self.selected_pawn}')
 
