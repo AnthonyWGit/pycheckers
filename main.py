@@ -14,10 +14,14 @@ class MainWindow:
         window.title("pyCheckers")
         window.geometry(f'{window_height}x{window_width}+{center_x}+{center_y}')
         self.board = Board(window)
+        self.turn_label = tk.Label(window, text=f"Turn {self.board.turn}")
+        self.turn_label.grid(row=0, column=0)
+        self.instruction_label = tk.Label(window, text="Choose a pawn to move") 
+        self.instruction_label.grid(row=1, column=0)
         self.button = tk.Button(window, text="Debug cells", command=self.board.log_debug_cells)
-        self.button.grid(row=20, column=2)
+        self.button.grid(row=21, column=2)
         self.button = tk.Button(window, text="Debug Pawns", command=self.board.log_debug_pawns)
-        self.button.grid(row=20, column=3)
+        self.button.grid(row=21, column=3)
 
     def run(self):
         self.window.mainloop()
@@ -27,7 +31,7 @@ class Board:
         #bord is a Canvas widget from Tkinter class
         self.board = tk.Canvas(window, borderwidth=1)
         #Drawing the grid
-        self.board.grid(row = 1, column = 0, sticky = "ew", columnspan= 8, rowspan= 8)
+        self.board.grid(row = 2, column = 0, sticky = "ew", columnspan= 8, rowspan= 8)
         self.row = 8
         self.col = 8
         #x and y size of square
