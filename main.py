@@ -16,12 +16,24 @@ class MainWindow:
         self.board = Board(window)
         self.turn_label = tk.Label(window, text=f"Turn {self.board.turn}")
         self.turn_label.grid(row=0, column=0)
+        self.player_color_turn = tk.Label(window, text="") 
+        self.player_color_turn.grid(row=1, column=0)
         self.instruction_label = tk.Label(window, text="Choose a pawn to move") 
-        self.instruction_label.grid(row=1, column=0)
+        self.instruction_label.grid(row=2, column=0)
         self.button = tk.Button(window, text="Debug cells", command=self.board.log_debug_cells)
-        self.button.grid(row=21, column=2)
+        self.button.grid(row=11, column=0)
         self.button = tk.Button(window, text="Debug Pawns", command=self.board.log_debug_pawns)
-        self.button.grid(row=21, column=3)
+        self.button.grid(row=11, column=1)
+        self.game_flow()
+
+    def game_flow(self):
+        if (self.board.turn % 2 ==  0):
+                print(self.window)
+                print(self.board.turn)
+                self.player_color_turn.config(text="White turn")
+                if self.board.on_click() == 
+        else:
+                self.player_color_turn.config(text="Blacks turn")
 
     def run(self):
         self.window.mainloop()
@@ -30,8 +42,9 @@ class Board:
     def __init__(self, window):
         #bord is a Canvas widget from Tkinter class
         self.board = tk.Canvas(window, borderwidth=1)
+        self.window = window
         #Drawing the grid
-        self.board.grid(row = 2, column = 0, sticky = "ew", columnspan= 8, rowspan= 8)
+        self.board.grid(row = 3, column = 0, sticky = "ew", columnspan= 8, rowspan= 8)
         self.row = 8
         self.col = 8
         #x and y size of square
@@ -59,25 +72,9 @@ class Board:
                 if (j < 3): # 0-1-2
                     if (j % 2 == 0):
                         for i in range(self.row):
-                            if (i % 2 == 0):
+                            if (i % 2 != 0):
                                 #Drawning : keep in mind pawn is not yet created 
                                 #This id refers the object created by TkInter Canvas 
-                                id = self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='white')
-                                #Create a pawn 
-                                pawn = Pawn('white', i, j, id)
-                                self.cells[i][j].pawned = pawn
-                                self.pawns.append(pawn)
-                    else:
-                        for i in range(self.row):
-                            if (i % 2 != 0):
-                                self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='white')
-                                pawn = Pawn('white', i, j, id)
-                                self.cells[i][j].pawned = pawn
-                                self.pawns.append(pawn)
-                elif( 5 <= j <= 7):
-                    if (j % 2 != 0):
-                        for i in range(self.row):
-                            if (i % 2 == 0):
                                 id = self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='black')
                                 #Create a pawn 
                                 pawn = Pawn('black', i, j, id)
@@ -85,9 +82,25 @@ class Board:
                                 self.pawns.append(pawn)
                     else:
                         for i in range(self.row):
-                            if (i % 2 != 0):
+                            if (i % 2 == 0):
                                 self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='black')
                                 pawn = Pawn('black', i, j, id)
+                                self.cells[i][j].pawned = pawn
+                                self.pawns.append(pawn)
+                elif( 5 <= j <= 7):
+                    if (j % 2 != 0):
+                        for i in range(self.row):
+                            if (i % 2 != 0):
+                                id = self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='white')
+                                #Create a pawn 
+                                pawn = Pawn('white', i, j, id)
+                                self.cells[i][j].pawned = pawn
+                                self.pawns.append(pawn)
+                    else:
+                        for i in range(self.row):
+                            if (i % 2 == 0):
+                                self.board.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='white')
+                                pawn = Pawn('white', i, j, id)
                                 self.cells[i][j].pawned = pawn
                                 self.pawns.append(pawn)
 
@@ -109,7 +122,7 @@ class Board:
                         self.board.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='white')
                     else:
                         self.board.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='black')
-
+    
     #In GUI environnement it will print adresses so we will need __repr__ or __str__ in Cell/ whatever class
     def log_debug_cells(self):
         print(self.cells)
@@ -135,15 +148,15 @@ class Pawn:
         self.y = y
         self.id = id #Imagine this is chess there are lots of two pieces and there is a notation of each piece 
 
-    def moving_forward(self): #Not complete and not functional, the idea is to retrieve where user clicks and move whithe to bottom of board 
-        #and blacks up
+    def moving_forward(self): #Not complete and not functional, the idea is to retrieve where user clicks and move whithe to top of board 
+        #and blacks bot
         if (self.color == "white"):
-            self.x = x + 1
-            self.y = y + 1
-        
-        if (self.color == "black"):
             self.x = x - 1
             self.y = y - 1
+        
+        if (self.color == "black"):
+            self.x = x + 1
+            self.y = y + 1
             
     def __repr__(self):
         return f"Pawn at ({self.x}, {self.y}), color: {self.color}, id: {self.id}."
