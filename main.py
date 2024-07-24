@@ -14,7 +14,7 @@ class MainWindow:
         window.title("pyCheckers")
         window.geometry(f'{window_height}x{window_width}+{center_x}+{center_y}')
         self.board = Board(window)
-        self.turn_label = tk.Label(window, text=f"Turn {self.board.turn}")
+        self.turn_label = tk.Label(window, text=f"")
         self.turn_label.grid(row=0, column=0)
         self.player_color_turn = tk.Label(window, text="Whites turn") 
         self.player_color_turn.grid(row=1, column=0)
@@ -38,8 +38,7 @@ class Board:
         #x and y size of square
         self.x = 30
         self.y = 30
-        self.turn = 0
-        self.cells = [[Cell(i, j, 'black' if (i+j)%2 == 0 else 'white') for j in range(8)] for i in range(8)]
+        self.cells = [[Cell(i, j, 'black' if (i+j)%2 == 0 else 'grey') for j in range(8)] for i in range(8)]
         self.pawns = []
         self.draw_board()
         self.start_place_pawns()
@@ -62,13 +61,13 @@ class Board:
                     else:
                         for i in range(self.row):
                             if (i % 2 == 0):
-                                self.canvas.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='black')
+                                id = self.canvas.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='black')
                                 pawn = Pawn('black', i, j, id)
                                 self.cells[i][j].pawned = pawn
                                 self.pawns.append(pawn)
                                 self.cells[i][j].free = False
                 elif( 5 <= j <= 7):
-                    if (j % 2 != 0):
+                    if (j % 2 == 0):
                         for i in range(self.row):
                             if (i % 2 != 0):
                                 id = self.canvas.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='white')
@@ -80,7 +79,7 @@ class Board:
                     else:
                         for i in range(self.row):
                             if (i % 2 == 0):
-                                self.canvas.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='white')
+                                id = self.canvas.create_oval((i * self.x) + 5,(j * self.y) + 5,((i + 1) * self.x) - 5,((j + 1) * self.y) - 5,fill='white')
                                 pawn = Pawn('white', i, j, id)
                                 self.cells[i][j].pawned = pawn
                                 self.pawns.append(pawn)
@@ -96,12 +95,12 @@ class Board:
                         # https://web.archive.org/web/20181223164027/http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/create_rectangle.html
                         self.canvas.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) * self.y,fill='black')
                     else:   
-                        self.canvas.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='white')
+                        self.canvas.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='grey')
             else:
                 for i in range(self.row):
                     #pair number
                     if(i % 2 == 0):
-                        self.canvas.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='white')
+                        self.canvas.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='grey')
                     else:
                         self.canvas.create_rectangle(i * self.x,j * self.y,(i + 1) * self.x,(j + 1) *self.y,fill='black')
     
@@ -152,14 +151,25 @@ class Game(MainWindow):
         self.pawn_current_pos = None
         self.pawn_new_pos = None
         self.selected_pawn = None
+        self.last_clicked_cell = None
+        self.turn = 0
+        self.turn_color = ''
+        self.turn_color_set()
     
     def run(self):
         self.window.mainloop()
 
+    def turn_color_set(self):
+        if self.turn % 2 == 0:
+            self.turn_color = 'white'
+            self.turn_label.config(text=f'Turn {self.turn}')
+        else:
+            self.turn_color = 'black'
+
     def select_pawn(self):
         #when Whites turn
-        if (self.board.turn % 2 ==  0):
-            print(self.board.turn)
+        if (self.turn % 2 == 0):
+            print(self.turn)
             #change label anouncing player turn 
             print(self.last_clicked_cell, 'fzerze')
             if (self.last_clicked_cell.free == False and self.last_clicked_cell.pawned.color == 'white'):
@@ -171,7 +181,14 @@ class Game(MainWindow):
             else:
                 print('a')
         else:
-            self.player_color_turn.config(text="Whites turn")
+            if (self.last_clicked_cell.free == False and self.last_clicked_cell.pawned.color == 'black'):
+                print('c')
+                self.instruction_label.config(text="Choose where you want your pawn to go")
+                self.pawn_current_pos = self.last_clicked_cell
+                self.selected_pawn = self.pawn_current_pos.pawned
+                return True
+            else:
+                print('d')
 
         # get x and y pos in the canvas 
     def on_click(self, event):
@@ -181,26 +198,29 @@ class Game(MainWindow):
         cell_y = event.y // self.board.y 
         # Now you can use these coordinates to move the pawn
         clicked_cell = self.board.cells[cell_x][cell_y]
-        print(f"Clicked on cell ({cell_x}, {cell_y},{clicked_cell}) Turn : {self.board.turn}")
+        print(f"BEGIN ONCLICK --------------- Clicked on cell ({cell_x}, {cell_y},{clicked_cell}) Turn : {self.turn}")
+        print(f'ALL CELLS {self.board.cells} /$$$$$ Clicked_cell var : {clicked_cell}')
         self.last_clicked_cell = clicked_cell
+        
         if self.selected_pawn == None:
             if self.select_pawn() == True:
                 print(f'Selected Pawn : {self.selected_pawn}')
                 return
+            
         if (self.selected_pawn != None):
-            print(f'Is INSTANCE SLECTED : {self.selected_pawn}')
+            print(f'Is INSTANCE SLECTED : {self.selected_pawn} TARGET : {self.last_clicked_cell}')
             if self.movement_is_valid() == True:
                 # Get the old cell
                 old_cell = self.board.cells[self.pawn_current_pos.x][self.pawn_current_pos.y]
                 # Update the old cell
                 old_cell.free = True
                 old_cell.pawned = None
-
-                # Update the pawn's position
+                print(f'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD {self.board.cells} DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD')
+                # Update the pawn's position --> BROKEN they erase the coordinates of the cell
                 self.pawn_current_pos.x = self.pawn_new_pos.x
                 self.pawn_current_pos.y = self.pawn_new_pos.y
-
                 # Get the new cell
+                print(f'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP{self.board.cells} DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD')
                 new_cell = self.board.cells[self.pawn_current_pos.x][self.pawn_current_pos.y]
                 # Update the new cell
                 new_cell.free = False
@@ -209,20 +229,38 @@ class Game(MainWindow):
                 self.selected_pawn.x = self.pawn_current_pos.x
                 self.selected_pawn.y = self.pawn_current_pos.y
                 self.move_pawn(self.selected_pawn, self.pawn_current_pos.x, self.pawn_current_pos.y)
+                
+                print(f'graphic movement {self.selected_pawn}')
 
-                #when everything is good increase turn count
-                self.board.turn += 1
+                #when everything is good increase turn count and clean values
+                self.turn += 1
+                self.turn_color_set()
+                self.turn_label.config(text=f'Turn {self.turn}')
+                self.instruction_label.config(text=f'Choose a pawn to move')
+                self.reset_values()
+
 
     def movement_is_valid(self):
         #check if white movement is correct
-        print(f'ee RTT {self.last_clicked_cell}')
-        if self.last_clicked_cell.free == True and self.last_clicked_cell.color == 'black':
+        print(f'ee RTT {self.last_clicked_cell} ////// {self.pawn_current_pos}')
+        if self.last_clicked_cell.free == True and self.last_clicked_cell.color == 'grey' and self.turn_color == 'white':
             newX = abs(self.last_clicked_cell.x - self.pawn_current_pos.x)
             newY = abs(self.last_clicked_cell.y - self.pawn_current_pos.y)
-            if newX == 1 and newY == 1:  # Check if the absolute difference is 1 because queen will be able to go backwards
+            print(newX, newY, self.last_clicked_cell, self.pawn_current_pos)
+            if newX == 1 and newY == 1:  # Check if the absolute difference is 1 because queen will be able to go  backwards
                 self.pawn_new_pos = self.last_clicked_cell
                 print(f'validated move, Pawn new pos : {self.pawn_new_pos}')
                 self.player_color_turn.config(text='Blacks turn')
+                return True
+        elif self.last_clicked_cell.free == True and self.last_clicked_cell.color == 'grey' and self.turn_color == 'black':
+            print('NEED TO SEE THIS PRINTTT')
+            newX = abs(self.last_clicked_cell.x - self.pawn_current_pos.x)
+            newY = abs(self.last_clicked_cell.y - self.pawn_current_pos.y)
+            print(newX, newY)
+            if newX == 1 and newY == 1:  # Check if the absolute difference is 1 because queen will be able to go backwards
+                self.pawn_new_pos = self.last_clicked_cell
+                print(f'validated move, Pawn new pos : {self.pawn_new_pos}')
+                self.player_color_turn.config(text='Whites turn')
                 return True
         return False
     
@@ -232,6 +270,12 @@ class Game(MainWindow):
                     (new_x + 1) * self.board.x - 5, (new_y + 1) * self.board.y - 5)
         # Use the coords method to update the pawn's position on the canvas
         self.board.canvas.coords(pawn.id, new_coords)
+
+    def reset_values(self):
+        self.pawn_current_pos = None
+        self.pawn_new_pos = None
+        self.last_clicked_cell = None
+        self.selected_pawn = None
 
 #Create the window and let it run until user quits 
 root = tk.Tk()
