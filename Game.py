@@ -67,6 +67,12 @@ class Game(MainWindow):
             
         if (self.selected_pawn != None):
             print(f'Is INSTANCE SLECTED : {self.selected_pawn} TARGET : {self.last_clicked_cell}')
+            # In this if a pawn is already select : first we check if the last clicked cell is the same so the user can cancel his choice
+            if (self.selected_pawn.x == self.last_clicked_cell.x) & (self.selected_pawn.y == self.last_clicked_cell.y):
+                self.reset_values()
+                self.instruction_label.config(text=f'Choose a pawn to move')
+                print(f'++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++JIJJI+++++++')
+                return
             if self.movement_is_valid() == True:
                 # Get the old cell
                 old_cell = self.board.cells[self.pawn_current_pos.x][self.pawn_current_pos.y]
