@@ -1,5 +1,8 @@
 import tkinter as tk
 from MainWindow import MainWindow
+from Cell import Cell
+from Board import Board
+from Pawn import Pawn
 
 class Game(MainWindow):
     def __init__(self, window):
@@ -73,7 +76,7 @@ class Game(MainWindow):
                 self.instruction_label.config(text=f'Choose a pawn to move')
                 print(f'++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++JIJJI+++++++')
                 return
-            if self.movement_is_valid() == True:
+            if self.movement_is_valid() == True or self.capture_pawn() == True:
                 # Get the old cell
                 old_cell = self.board.cells[self.pawn_current_pos.x][self.pawn_current_pos.y]
                 # Update the old cell
@@ -90,11 +93,8 @@ class Game(MainWindow):
                 # Update the new cell
                 new_cell.free = False
                 new_cell.pawned = self.selected_pawn
-
                 self.move_pawn(self.selected_pawn, self.selected_pawn.x, self.selected_pawn.y)
-                
                 print(f'graphic movement {self.selected_pawn}')
-
                 #when everything is good increase turn count and clean values
                 self.turn += 1
                 self.turn_color_set()
@@ -133,6 +133,72 @@ class Game(MainWindow):
                     (new_x + 1) * self.board.x - 5, (new_y + 1) * self.board.y - 5)
         # Use the coords method to update the pawn's position on the canvas
         self.board.canvas.coords(pawn.id, new_coords)
+
+    def capture_pawn(self):
+        #check if white movement is correct
+        if self.last_clicked_cell.free == True and self.last_clicked_cell.color == 'grey' and self.turn_color == 'white':
+            newX = self.last_clicked_cell.x - self.pawn_current_pos.x
+            newY = self.last_clicked_cell.y - self.pawn_current_pos.y
+            if newX == -2 and newY == -2:  #Up left movement from whites 
+                midX = self.last_clicked_cell.x + 1
+                midY = self.last_clicked_cell.y + 1
+                if self.board.cells[midX][midY].free != True:
+                    captured_pawn = self.board.cells[midX][midY].pawned
+                    self.board.pawns.remove(captured_pawn)
+                    self.board.canvas.delete(captured_pawn.id)
+                    self.board.cells[midX][midY].free = True
+                    self.board.cells[midX][midY].pawned = None
+                    self.player_color_turn.config(text='Blacks turn')
+                    return True
+            elif newX == 2 and newY == -2:  #Up right movement from whites
+                midX = self.last_clicked_cell.x - 1
+                midY = self.last_clicked_cell.y + 1
+                if self.board.cells[midX][midY].free != True:
+                    captured_pawn = self.board.cells[midX][midY].pawned
+                    self.board.pawns.remove(captured_pawn)
+                    self.board.canvas.delete(captured_pawn.id)
+                    self.board.cells[midX][midY].free = True
+                    self.board.cells[midX][midY].pawned = None
+                    self.player_color_turn.config(text='Blacks turn')
+                    return True
+        elif self.last_clicked_cell.free == True and self.last_clicked_cell.color == 'grey' and self.turn_color == 'black':
+            newX = self.last_clicked_cell.x - self.pawn_current_pos.x
+            newY = self.last_clicked_cell.y - self.pawn_current_pos.y
+            if newX == -2 and newY == 2:  #down left movement from blacks
+                midX = self.last_clicked_cell.x + 1
+                midY = self.last_clicked_cell.y - 1
+                if self.board.cells[midX][midY].free != True:
+                    captured_pawn = self.board.cells[midX][midY].pawned
+                    self.board.pawns.remove(captured_pawn)
+                    self.board.canvas.delete(captured_pawn.id)
+                    self.board.cells[midX][midY].free = True
+                    self.board.cells[midX][midY].pawned = None
+                    self.player_color_turn.config(text='Whites turn')
+                    return True
+            elif newX == 2 and newY == 2:  #Down right movement from blacks
+                midX = self.last_clicked_cell.x - 1
+                midY = self.last_clicked_cell.y -1
+                if self.board.cells[midX][midY].free != True:
+                    captured_pawn = self.board.cells[midX][midY].pawned
+                    self.board.pawns.remove(captured_pawn)
+                    self.board.canvas.delete(captured_pawn.id)
+                    self.board.cells[midX][midY].free = True
+                    self.board.cells[midX][midY].pawned = None
+                    self.player_color_turn.config(text='Whites turn')
+                    return True
+        return False
+    
+    def movement_direction(self, pawn, new_x, new_y):
+        if self.turn_color == 'white':
+            if new_x == -1 and new_y == -1:
+                return 'up_left'
+            if new_x == 1 and new_y == -1:
+                return 'up_right'
+        if self.turn_color == 'black':
+            if new_x == -1 and new_y == 1:
+                return 'down_left'
+            if new_x == 1 and new_y == 1:
+                return 'down_right'
 
     def reset_values(self):
         self.pawn_current_pos = None
