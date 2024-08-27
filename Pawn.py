@@ -6,6 +6,7 @@ class Pawn:
         self.x = x
         self.y = y
         self.id = id #Imagine this is chess there are lots of two pieces and there is a notation of each piece 
+        self.type = 'pawn'
 
     def moving_forward(self): #Not complete and not functional, the idea is to retrieve where user clicks and move whithe to top of board 
         #and blacks bot
