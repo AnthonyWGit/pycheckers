@@ -13,7 +13,7 @@ class Game(MainWindow):
         self.pawn_new_pos = None
         self.selected_pawn = None
         self.last_clicked_cell = None
-        self.turn = 0
+        self.turn = 1
         self.turn_color = ''
         self.turn_color_set()
     
@@ -22,14 +22,22 @@ class Game(MainWindow):
 
     def turn_color_set(self):
         if self.turn % 2 == 0:
-            self.turn_color = 'white'
+            self.turn_color = 'black'
             self.turn_label.config(text=f'Turn {self.turn}')
         else:
-            self.turn_color = 'black'
+            self.turn_color = 'white'
+            self.turn_label.config(text=f'Turn {self.turn}')
+
+    def turn_switch(self):
+        self.turn += 1
+        self.turn_color_set()
+        self.turn_label.config(text=f'Turn {self.turn}')
+        self.instruction_label.config(text=f'Choose a pawn to move')
+        self.reset_values()
 
     def select_pawn(self):
         #when Whites turn
-        if (self.turn % 2 == 0):
+        if (self.turn % 2 != 0):
             print(self.turn)
             #change label anouncing player turn 
             print(self.last_clicked_cell, 'fzerze')
@@ -96,11 +104,7 @@ class Game(MainWindow):
                 self.move_pawn(self.selected_pawn, self.selected_pawn.x, self.selected_pawn.y)
                 print(f'graphic movement {self.selected_pawn}')
                 #when everything is good increase turn count and clean values
-                self.turn += 1
-                self.turn_color_set()
-                self.turn_label.config(text=f'Turn {self.turn}')
-                self.instruction_label.config(text=f'Choose a pawn to move')
-                self.reset_values()
+                self.turn_switch()
 
 
     def movement_is_valid(self):
