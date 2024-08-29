@@ -138,7 +138,7 @@ class Game(MainWindow):
                 newX = abs(self.last_clicked_cell.x - self.pawn_current_pos.x)
                 newY = abs(self.last_clicked_cell.y - self.pawn_current_pos.y)
                 print(newX, newY, self.last_clicked_cell, self.pawn_current_pos)
-                if newX == 1 and newY == 1:  # Check if the absolute difference is 1 because queen will be able to go  backwards
+                if self.last_clicked_cell.color == 'grey':  # Check if the absolute difference is 1 because queen will be able to go  backwards
                     self.pawn_new_pos = self.last_clicked_cell
                     print(f'validated move, Pawn new pos : {self.pawn_new_pos}')
                     self.player_color_turn.config(text='Blacks turn')
@@ -148,7 +148,7 @@ class Game(MainWindow):
                 newX = abs(self.last_clicked_cell.x - self.pawn_current_pos.x)
                 newY = abs(self.last_clicked_cell.y - self.pawn_current_pos.y)
                 print(newX, newY)
-                if newX == 1 and newY == 1:  # Check if the absolute difference is 1 because queen will be able to go backwards
+                if self.last_clicked_cell.color == 'grey':  # Check if the absolute difference is 1 because queen will be able to go backwards
                     self.pawn_new_pos = self.last_clicked_cell
                     print(f'validated move, Pawn new pos : {self.pawn_new_pos}')
                     self.player_color_turn.config(text='Whites turn')
@@ -228,7 +228,7 @@ class Game(MainWindow):
 
         # Promote blacks when they reach opposite side of the board
         elif (self.selected_pawn.type == 'pawn' and self.turn_color == 'black' 
-            and self.selected_pawn.x % 2 == 0 and self.selected_pawn.y == 0):
+            and self.selected_pawn.x % 2 == 0 and self.selected_pawn.y == 7):
             self.selected_pawn.type = 'queen'
             self.board.canvas.itemconfig(self.selected_pawn.id,fill='red')
 
