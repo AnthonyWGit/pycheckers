@@ -103,6 +103,8 @@ class Game(MainWindow):
                 new_cell.pawned = self.selected_pawn
                 self.move_pawn(self.selected_pawn, self.selected_pawn.x, self.selected_pawn.y)
                 print(f'graphic movement {self.selected_pawn}')
+                #check promotions
+                self.promote_pawn()
                 #when everything is good increase turn count and clean values
                 self.turn_switch()
 
@@ -216,6 +218,23 @@ class Game(MainWindow):
         self.board.canvas.delete(captured_pawn.id)
         self.board.cells[midX][midY].free = True
         self.board.cells[midX][midY].pawned = None
+
+    def promote_pawn(self):
+        # Promote whites when they reach opposite side of the board
+        if (self.selected_pawn.type == 'pawn' and self.turn_color == 'white' 
+            and self.selected_pawn.x % 2 != 0 and self.selected_pawn.y == 0):
+            self.selected_pawn.type = 'queen'
+            self.board.canvas.itemconfig(self.selected_pawn.id,fill='blue')
+
+        # Promote blacks when they reach opposite side of the board
+        elif (self.selected_pawn.type == 'pawn' and self.turn_color == 'black' 
+            and self.selected_pawn.x % 2 == 0 and self.selected_pawn.y == 0):
+            self.selected_pawn.type = 'queen'
+            self.board.canvas.itemconfig(self.selected_pawn.id,fill='red')
+
+        else:
+            print(f'nothing promoted')
+    
 
     def reset_values(self):
         self.pawn_current_pos = None
