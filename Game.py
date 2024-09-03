@@ -18,6 +18,7 @@ class Game(MainWindow):
         self.hypoX = None
         self.hypoY = None
         self.turn_color_set()
+        self.pawnsEncountered = []
     
     def run(self):
         self.window.mainloop()
@@ -94,6 +95,9 @@ class Game(MainWindow):
                 self.promote_pawn()
                 #when everything is good increase turn count and clean values
                 self.turn_switch()
+            if self.movement_is_valid == False:
+                print('false movement')
+                self.soft_reset()
 
 
     def movement_is_valid(self):
@@ -117,21 +121,34 @@ class Game(MainWindow):
         elif self.selected_pawn.type == 'queen':
             newX = self.last_clicked_cell.x - self.pawn_current_pos.x
             newY = self.last_clicked_cell.y - self.pawn_current_pos.y
+            direction_label = self.movement_direction(newX,newY)
             if self.last_clicked_cell.free == True and self.last_clicked_cell.color == 'grey' and self.turn_color == 'white':
                 if self.last_clicked_cell.color == 'grey' and self.movement_direction(newX, newY) != None:  # Check if the absolute difference is 1 because queen will be able to go  backwards
-                    if self.calc_diagonal(newX, newY) == 1: #Not correct move
+                    if self.calc_diagonal(newX, newY, direction_label) == 1: #Not correct move
+                        self.soft_reset()
                         return False
-                    elif self.calc_diagonal(newX, newY) == 0: #legit move - no capture
+                    elif self.calc_diagonal(newX, newY, direction_label) == 0: #legit move - no capture
+                        self.pawn_new_pos = self.last_clicked_cell
+                        self.player_color_turn.config(text='Blacks turn')
+                        return True
+                    elif (self.calc_diagonal(newX,newY, direction_label) == 3): #capture opposite
+                        self.capture_queen(self.hypoX, self.hypoY, direction_label)
                         self.pawn_new_pos = self.last_clicked_cell
                         self.player_color_turn.config(text='Blacks turn')
                         return True
             elif self.last_clicked_cell.free == True and self.last_clicked_cell.color == 'grey' and self.turn_color == 'black':
                 if self.last_clicked_cell.color == 'grey' and self.movement_direction(newX, newY) != None:  # Check if the absolute difference is 1 because queen will be able to go  backwards
-                    if self.calc_diagonal(newX, newY) == 1: #invalid move
+                    if self.calc_diagonal(newX, newY, direction_label) == 1: #invalid move
+                        self.soft_reset() #clears the encountered list 
                         return False
-                    elif self.calc_diagonal(newX, newY) == 0:
+                    elif self.calc_diagonal(newX, newY, direction_label) == 0:
                         self.pawn_new_pos = self.last_clicked_cell
-                        self.player_color_turn.config(text='Blacks turn')
+                        self.player_color_turn.config(text='Whites turn')
+                        return True
+                    elif self.calc_diagonal(newX, newY, direction_label) == 3:
+                        self.capture_queen(self.hypoX, self.hypoY, direction_label)
+                        self.pawn_new_pos = self.last_clicked_cell
+                        self.player_color_turn.config(text='Whites turn')
                         return True
             return False
             
@@ -181,6 +198,24 @@ class Game(MainWindow):
                 return False
         return False
 
+    def capture_queen(self, hypoX, hypoY, direction):
+        if self.selected_pawn.type == "queen":
+            if self.last_clicked_cell.free == True:
+                if direction == "down_left":
+                    hypoX = hypoY + 1
+                    hypoY = hypoY - 1
+                if direction == "down_right":
+                    hypoX = hypoX - 1
+                    hypoY = hypoY - 1
+                if direction == "up_left":
+                    hypoX = hypoX + 1
+                    hypoY = hypoX + 1
+                if direction == "up_right":
+                    hypoX = hypoX - 1
+                    hypoY = hypoY + 1
+                print(f'remoove')
+                self.remove_pawn_from_board(hypoX, hypoY)
+
         #check if white movement is correct
         # if self.last_clicked_cell.free == True and self.last_clicked_cell.color == 'grey' and self.turn_color == 'white':
         #     newX = self.last_clicked_cell.x - self.pawn_current_pos.x
@@ -219,6 +254,9 @@ class Game(MainWindow):
         # return False
     
     def movement_direction(self, new_x, new_y):
+        if abs(new_x) != abs(new_y): #using absolutes to verify diagonals
+            return None  
+
         if self.selected_pawn.type == 'pawn':
             if self.turn_color == 'white':
                 if new_x == -1 and new_y == -1:
@@ -264,54 +302,52 @@ class Game(MainWindow):
         else:
             print(f'nothing promoted')
     
-    def calc_diagonal(self, newX, newY):
-        print(f'z, {self.player_color_turn}')
-        i = abs(newX)
-        roadblock = None
-        while (i > 0):
-            if self.last_clicked_cell.free != True:
-                return None
-            if self.movement_direction(newX, newY) == 'down_left':
-                self.hypoX = self.selected_pawn.x - i
-                self.hypoY = self.selected_pawn.y + i
-                print(f'{newX, newY, self.movement_direction(newX, newY), self.hypoX, self.hypoY}')
-                print(f'{self.board.cells[self.hypoX][self.hypoY].pawned}')
-                if(self.board.cells[self.hypoX][self.hypoY].pawned is not None and self.board.cells[self.hypoX][self.hypoY].pawned.color == self.turn_color):
-                    print('roadblock')
-                    roadblock = True
-                    break
-            if self.movement_direction(newX, newY) == 'down_right':
-                self.hypoX = self.selected_pawn.x + i
-                self.hypoY = self.selected_pawn.y + i
-                print(f'{newX, newY, self.movement_direction(newX, newY), self.hypoX, self.hypoY}')
-                if(self.board.cells[self.hypoX][self.hypoY].pawned is not None and self.board.cells[self.hypoX][self.hypoY].pawned.color == self.turn_color):
-                    print('roadblock')
-                    roadblock = True
-                    break
-            if self.movement_direction(newX, newY) == 'up_left':
-                self.hypoX = self.selected_pawn.x - i
-                self.hypoY = self.selected_pawn.y - i
-                print(f'{newX, newY, self.movement_direction(newX, newY), self.hypoX, self.hypoY}')
-                if(self.board.cells[self.hypoX][self.hypoY].pawned is not None and self.board.cells[self.hypoX][self.hypoY].pawned.color == self.turn_color):
-                    print('roadblock')
-                    roadblock = True
-                    break
-            if self.movement_direction(newX, newY) == 'up_right':
-                self.hypoX = self.selected_pawn.x + i
-                self.hypoY = self.selected_pawn.y - i
-                print(f'{newX, newY, self.movement_direction(newX, newY), self.hypoX, self.hypoY}')
-                if(self.board.cells[self.hypoX][self.hypoY].pawned is not None and self.board.cells[self.hypoX][self.hypoY].pawned.color == self.turn_color):
-                    print('roadblock')
-                    roadblock = True
-                    break
-            i = i - 1
-        if roadblock:
-            return 1
-        else:
-            return 0
+    def calc_diagonal(self, newX, newY, direction):
+        while self.hypoX != self.last_clicked_cell.x and self.hypoY != self.last_clicked_cell.y:
+            if self.hypoX == None and self.hypoY == None:
+                self.hypoX = self.selected_pawn.x
+                self.hypoY = self.selected_pawn.y
+            if direction == "down_left":
+                self.hypoX = self.hypoX - 1
+                self.hypoY = self.hypoY + 1
+            if direction == "down_right":
+                self.hypoX = self.hypoX + 1
+                self.hypoY = self.hypoY + 1
+            if direction == "up_left":
+                self.hypoX = self.hypoX - 1
+                self.hypoY = self.hypoY - 1
+            if direction == "up_right":
+                self.hypoX = self.hypoX + 1
+                self.hypoY = self.hypoY - 1
+            if self.board.cells is not None and self.board.cells[self.hypoX][self.hypoY].pawned:
+                encounteredPawn = self.board.cells[self.hypoX][self.hypoY].pawned
+                self.pawnsEncountered.append(encounteredPawn)
+            print(f'{self.hypoX} --- {self.hypoY} -- {self.last_clicked_cell.x} -- {self.last_clicked_cell.y} -- {self.pawnsEncountered}')
+            
+        for pawn in self.pawnsEncountered:
+            if pawn.color == self.turn_color or len(self.pawnsEncountered) > 1:
+                self.soft_reset()
+                print('roadblock')
+                return 1 
+        if len(self.pawnsEncountered) == 1 and self.pawnsEncountered[0].color != self.turn_color:
+                print('capture')
+                return 3
+
+        print('nothing')
+        return 0
 
     def reset_values(self):
         self.pawn_current_pos = None
         self.pawn_new_pos = None
         self.last_clicked_cell = None
         self.selected_pawn = None
+        self.pawnsEncountered.clear()
+        self.hypoX = None
+        self.hypoY = None
+
+    def soft_reset(self):
+        self.pawnsEncountered.clear()
+        self.hypoX = None
+        self.hypoY = None
+        self.pawn_new_pos = None
+        self.last_clicked_cell = None
