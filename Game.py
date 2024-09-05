@@ -15,10 +15,12 @@ class Game(MainWindow):
         self.last_clicked_cell = None
         self.turn = 1
         self.turn_color = ''
+        self.direction = ''
         self.hypoX = None #Used in queen movement
         self.hypoY = None
         self.turn_color_set()
         self.pawnsEncountered = [] # Used in queen movement
+        self.capture = False
     
     def run(self):
         self.window.mainloop()
@@ -27,9 +29,11 @@ class Game(MainWindow):
         if self.turn % 2 == 0:
             self.turn_color = 'black'
             self.turn_label.config(text=f'Turn {self.turn}')
+            self.player_color_turn.config(text='Blacks turn')
         else:
             self.turn_color = 'white'
             self.turn_label.config(text=f'Turn {self.turn}')
+            self.player_color_turn.config(text='Whites turn')
 
     def turn_switch(self):
         self.turn += 1
@@ -76,6 +80,7 @@ class Game(MainWindow):
                 self.instruction_label.config(text=f'Choose a pawn to move')
                 return
             if self.movement_is_valid() == True or self.capture_pawn() == True:
+                #check if capture
                 # Get the old cell
                 old_cell = self.board.cells[self.pawn_current_pos.x][self.pawn_current_pos.y]
                 # Update the old cell
@@ -92,29 +97,32 @@ class Game(MainWindow):
                 self.move_pawn(self.selected_pawn, self.selected_pawn.x, self.selected_pawn.y)
                 #check promotions
                 self.promote_pawn()
+                self.pawn_current_pos = self.selected_pawn
                 #when everything is good increase turn count and clean values
-                self.turn_switch()
+                if self.capture_additional() == False:
+                    self.turn_switch()
             if self.movement_is_valid == False:
                 print('false movement')
                 self.soft_reset()
 
-
     def movement_is_valid(self):
         #check if white movement is correct
         if self.selected_pawn.type == 'pawn':
+            print(f'XXXXX----{self.last_clicked_cell}----XXXXX{self.selected_pawn}')
             if self.last_clicked_cell.free == True and self.last_clicked_cell.color == 'grey' and self.turn_color == 'white':
                 newX = self.last_clicked_cell.x - self.pawn_current_pos.x
                 newY = self.last_clicked_cell.y - self.pawn_current_pos.y
+                print(f'{newX} /--/ {newY}')
+                print(f'{self.last_clicked_cell.x} - {self.pawn_current_pos.x} / {self.last_clicked_cell.y} - {self.pawn_current_pos.y}')
                 if newX == -1 and newY == -1 or newX == 1 and newY == -1:  # No absolute because we are using pawn movvement (standard)
                     self.pawn_new_pos = self.last_clicked_cell
-                    self.player_color_turn.config(text='Blacks turn')
                     return True
             elif self.last_clicked_cell.free == True and self.last_clicked_cell.color == 'grey' and self.turn_color == 'black':
                 newX = self.last_clicked_cell.x - self.pawn_current_pos.x
                 newY = self.last_clicked_cell.y - self.pawn_current_pos.y
+                print(f'{newX} - {newY}')
                 if newX == -1 and newY == 1 or newX == 1 and newY == 1:  #  No absolute because we are using pawn movvement (standard)
                     self.pawn_new_pos = self.last_clicked_cell
-                    self.player_color_turn.config(text='Whites turn')
                     return True
             return False
         elif self.selected_pawn.type == 'queen':
@@ -128,12 +136,11 @@ class Game(MainWindow):
                         return False
                     elif self.calc_diagonal(newX, newY, direction_label) == 0: #legit move - no capture
                         self.pawn_new_pos = self.last_clicked_cell
-                        self.player_color_turn.config(text='Blacks turn')
                         return True
                     elif (self.calc_diagonal(newX,newY, direction_label) == 3): #capture opposite
+                        self.capture = True
                         self.capture_queen(self.hypoX, self.hypoY, direction_label)
                         self.pawn_new_pos = self.last_clicked_cell
-                        self.player_color_turn.config(text='Blacks turn')
                         return True
             elif self.last_clicked_cell.free == True and self.last_clicked_cell.color == 'grey' and self.turn_color == 'black':
                 if self.last_clicked_cell.color == 'grey' and self.movement_direction(newX, newY) != None:  # Check if the absolute difference is 1 because queen will be able to go  backwards
@@ -142,12 +149,11 @@ class Game(MainWindow):
                         return False
                     elif self.calc_diagonal(newX, newY, direction_label) == 0:
                         self.pawn_new_pos = self.last_clicked_cell
-                        self.player_color_turn.config(text='Whites turn')
                         return True
                     elif self.calc_diagonal(newX, newY, direction_label) == 3:
+                        self.capture = True
                         self.capture_queen(self.hypoX, self.hypoY, direction_label)
                         self.pawn_new_pos = self.last_clicked_cell
-                        self.player_color_turn.config(text='Whites turn')
                         return True
             return False
             
@@ -159,6 +165,7 @@ class Game(MainWindow):
         # Use the coords method to update the pawn's position on the canvas
         self.board.canvas.coords(pawn.id, new_coords)
 
+
     def capture_pawn(self):
         if self.selected_pawn.type == 'pawn':
             if self.last_clicked_cell.free == True:
@@ -169,31 +176,61 @@ class Game(MainWindow):
                         midX = self.last_clicked_cell.x + 1
                         midY = self.last_clicked_cell.y + 1
                         if self.board.cells[midX][midY].free != True:
+                            self.capture = True
                             self.remove_pawn_from_board(midX, midY)
-                            self.player_color_turn.config(text='Blacks turn')
                             return True
-                    elif newX == 2 and newY == -2:  #Up right movement from whites
+                    if newX == 2 and newY == -2:  #Up right movement from whites
                         midX = self.last_clicked_cell.x - 1
                         midY = self.last_clicked_cell.y + 1
                         if self.board.cells[midX][midY].free != True:
+                            self.capture = True
                             self.remove_pawn_from_board(midX, midY)
-                            self.player_color_turn.config(text='Blacks turn')
                             return True
+                if self.capture == True:
+                        if newX == -2 and newY == 2:  #Down left movement from whites 
+                            midX = self.last_clicked_cell.x + 1
+                            midY = self.last_clicked_cell.y - 1
+                            if self.board.cells[midX][midY].free != True:
+                                self.capture = True
+                                self.remove_pawn_from_board(midX, midY)
+                                return True
+                        if newX == 2 and newY == 2:  #Down right movement from whites
+                            midX = self.last_clicked_cell.x - 1
+                            midY = self.last_clicked_cell.y - 1
+                            if self.board.cells[midX][midY].free != True:
+                                self.capture = True
+                                self.remove_pawn_from_board(midX, midY)
+                                return True
                 if self.last_clicked_cell.color == 'grey' and self.turn_color == 'black':
                     if newX == -2 and newY == 2:  #down left movement from blacks
                         midX = self.last_clicked_cell.x + 1
                         midY = self.last_clicked_cell.y - 1
                         if self.board.cells[midX][midY].free != True:
+                            self.capture = True
                             self.remove_pawn_from_board(midX, midY)
-                            self.player_color_turn.config(text='Whites turn')
                             return True
-                    elif newX == 2 and newY == 2:  #Down right movement from blacks
+                    if newX == 2 and newY == 2:  #Down right movement from blacks
                         midX = self.last_clicked_cell.x - 1
                         midY = self.last_clicked_cell.y - 1
                         if self.board.cells[midX][midY].free != True:
+                            self.capture = True
                             self.remove_pawn_from_board(midX, midY)
-                            self.player_color_turn.config(text='Whites turn')
                             return True
+                    if self.capture == True:
+                        if newX == -2 and newY == -2:  #Up left movement from blacks
+                            midX = self.last_clicked_cell.x + 1
+                            midY = self.last_clicked_cell.y + 1
+                            if self.board.cells[midX][midY].free != True:
+                                self.capture = True
+                                self.remove_pawn_from_board(midX, midY)
+                                return True
+                        if newX == 2 and newY == -2:  #Up right movement from blacks
+                            midX = self.last_clicked_cell.x - 1
+                            midY = self.last_clicked_cell.y + 1
+                            if self.board.cells[midX][midY].free != True:
+                                self.capture = True
+                                self.remove_pawn_from_board(midX, midY)
+                                return True
                 return False
         return False
 
@@ -328,6 +365,46 @@ class Game(MainWindow):
         print('nothing')
         return 0
 
+    def capture_additional(self):
+        additional_turn = False
+        # Out of bounds checks to avoid error index out of range 
+        bX = [0, 7]
+        bY = [0, 7]
+        filtered_cells = []
+
+        # First check the nearest cells of the pawn that did a capture
+        cells2Check = {
+            "up_right": (self.selected_pawn.x + 1, self.selected_pawn.y - 1),
+            "up_left": (self.selected_pawn.x - 1, self.selected_pawn.y - 1),
+            "down_left": (self.selected_pawn.x - 1, self.selected_pawn.y + 1),
+            "down_right": (self.selected_pawn.x + 1, self.selected_pawn.y + 1)
+        }
+
+        # Loop over all the cells to check and add the correct ones to the filtered cells list 
+        for direction, (x, y) in cells2Check.items():
+            if bX[0] <= x <= bX[1] and bY[0] <= y <= bY[1]:
+                filtered_cells.append((direction, x, y))
+
+        # Loop all over the filtered cells and if there is one where there is an enemy pawn and a free cell behind, turn on the additional turn to true
+        for direction, x, y in filtered_cells:
+            cell = self.board.cells[x][y]
+            if direction == "up_right":
+                behind_x, behind_y = x + 1, y - 1
+            elif direction == "up_left":
+                behind_x, behind_y = x - 1, y - 1
+            elif direction == "down_right":
+                behind_x, behind_y = x + 1, y + 1
+            elif direction == "down_left":
+                behind_x, behind_y = x - 1, y + 1
+
+            if (bX[0] <= behind_x <= bX[1] and bY[0] <= behind_y <= bY[1]):
+                behind_cell = self.board.cells[behind_x][behind_y]
+                if (cell.pawned is not None and cell.pawned.color != self.turn_color and behind_cell.free == True and self.capture):
+                    additional_turn = True
+                    break  # No need to check further if we already found a valid capture
+        
+        return additional_turn
+
     def reset_values(self):
         self.pawn_current_pos = None
         self.pawn_new_pos = None
@@ -336,6 +413,7 @@ class Game(MainWindow):
         self.pawnsEncountered.clear()
         self.hypoX = None
         self.hypoY = None
+        self.capture = False
 
     #soft reset does not erase the current position of pawn. Is is used to reset variables without deselecting a pawn
     def soft_reset(self):
