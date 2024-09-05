@@ -200,20 +200,10 @@ class Game(MainWindow):
     def capture_queen(self, hypoX, hypoY, direction):
         if self.selected_pawn.type == "queen":
             if self.last_clicked_cell.free == True:
-                if direction == "down_left":
-                    hypoX = hypoY + 1
-                    hypoY = hypoY - 1
-                if direction == "down_right":
-                    hypoX = hypoX - 1
-                    hypoY = hypoY - 1
-                if direction == "up_left":
-                    hypoX = hypoX + 1
-                    hypoY = hypoX + 1
-                if direction == "up_right":
-                    hypoX = hypoX - 1
-                    hypoY = hypoY + 1
                 print(f'remoove')
-                self.remove_pawn_from_board(hypoX, hypoY)
+                xToRemove = self.pawnsEncountered[0].x
+                yToRemove = self.pawnsEncountered[0].y
+                self.remove_pawn_from_board(xToRemove, yToRemove)
 
         #check if white movement is correct
         # if self.last_clicked_cell.free == True and self.last_clicked_cell.color == 'grey' and self.turn_color == 'white':
