@@ -15,10 +15,10 @@ class Game(MainWindow):
         self.last_clicked_cell = None
         self.turn = 1
         self.turn_color = ''
-        self.hypoX = None
+        self.hypoX = None #Used in queen movement
         self.hypoY = None
         self.turn_color_set()
-        self.pawnsEncountered = []
+        self.pawnsEncountered = [] # Used in queen movement
     
     def run(self):
         self.window.mainloop()
@@ -84,7 +84,6 @@ class Game(MainWindow):
                 #selected pawn getting the same coords as the last clicked cell 
                 self.selected_pawn.x = self.last_clicked_cell.x
                 self.selected_pawn.y = self.last_clicked_cell.y
-                # Get the new cell
                 # Get the new cell
                 new_cell = self.board.cells[self.last_clicked_cell.x][self.last_clicked_cell.y]
                 # Update the new cell
@@ -319,11 +318,14 @@ class Game(MainWindow):
             if direction == "up_right":
                 self.hypoX = self.hypoX + 1
                 self.hypoY = self.hypoY - 1
+            #Store all encountered pawns in a list
             if self.board.cells is not None and self.board.cells[self.hypoX][self.hypoY].pawned:
                 encounteredPawn = self.board.cells[self.hypoX][self.hypoY].pawned
                 self.pawnsEncountered.append(encounteredPawn)
             print(f'{self.hypoX} --- {self.hypoY} -- {self.last_clicked_cell.x} -- {self.last_clicked_cell.y} -- {self.pawnsEncountered}')
             
+        #If there is one or more pawn of the same color of the player in the diagonal the move is not valid
+        #If there are more than one pawn of the opposite color the move is not valid
         for pawn in self.pawnsEncountered:
             if pawn.color == self.turn_color or len(self.pawnsEncountered) > 1:
                 self.soft_reset()
@@ -345,6 +347,7 @@ class Game(MainWindow):
         self.hypoX = None
         self.hypoY = None
 
+    #soft reset does not erase the current position of pawn. Is is used to reset variables without deselecting a pawn
     def soft_reset(self):
         self.pawnsEncountered.clear()
         self.hypoX = None
