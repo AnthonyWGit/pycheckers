@@ -69,7 +69,7 @@ class Game(MainWindow):
         self.last_clicked_cell = clicked_cell
         
         if self.selected_pawn == None:
-            if self.select_pawn() == True:
+            if self.select_pawn() == True and self.capture == False:
                 print(f'Selected Pawn : {self.selected_pawn}')
                 return
             
