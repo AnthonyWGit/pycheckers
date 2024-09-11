@@ -105,6 +105,8 @@ class Game(MainWindow):
                 #check promotions
                 self.promote_pawn()
                 self.pawn_current_pos = self.selected_pawn
+                if self.selected_pawn.type == "queen" and self.capture:
+                    self.soft_reset()
                 #when everything is good increase turn count and clean values
                 if self.capture_additional() == False:
                     self.turn_switch()
