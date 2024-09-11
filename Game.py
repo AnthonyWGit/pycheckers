@@ -21,6 +21,7 @@ class Game(MainWindow):
         self.turn_color_set()
         self.pawnsEncountered = [] # Used in queen movement
         self.capture = False
+        self.blinking = False
     
     def run(self):
         self.window.mainloop()
@@ -40,6 +41,7 @@ class Game(MainWindow):
         self.turn_color_set()
         self.turn_label.config(text=f'Turn {self.turn}')
         self.instruction_label.config(text=f'Choose a pawn to move')
+        self.additional_info_capture.config(text='')
         self.reset_values()
 
     def select_pawn(self):
@@ -50,12 +52,16 @@ class Game(MainWindow):
                 self.instruction_label.config(text="Choose where you want your pawn to go")
                 self.pawn_current_pos = self.last_clicked_cell
                 self.selected_pawn = self.pawn_current_pos.pawned
+                self.blinking = True
+                self.blink()
                 return True
         else:
             if (self.last_clicked_cell.free == False and self.last_clicked_cell.pawned.color == 'black'):
                 self.instruction_label.config(text="Choose where you want your pawn to go")
                 self.pawn_current_pos = self.last_clicked_cell
                 self.selected_pawn = self.pawn_current_pos.pawned
+                self.blinking = True
+                self.blink()
                 return True
 
         # get x and y pos in the canvas 
@@ -76,6 +82,7 @@ class Game(MainWindow):
         if (self.selected_pawn != None):
             # In this if a pawn is already select : first we check if the last clicked cell is the same so the user can cancel his choice
             if (self.selected_pawn.x == self.last_clicked_cell.x) & (self.selected_pawn.y == self.last_clicked_cell.y):
+                self.stop_blink()
                 self.reset_values()
                 self.instruction_label.config(text=f'Choose a pawn to move')
                 return
@@ -400,12 +407,14 @@ class Game(MainWindow):
             if (bX[0] <= behind_x <= bX[1] and bY[0] <= behind_y <= bY[1]):
                 behind_cell = self.board.cells[behind_x][behind_y]
                 if (cell.pawned is not None and cell.pawned.color != self.turn_color and behind_cell.free == True and self.capture):
+                    self.additional_info_capture.config(text='You need to do an additionnal capture')
                     additional_turn = True
                     break  # No need to check further if we already found a valid capture
         
         return additional_turn
 
     def reset_values(self):
+        self.stop_blink()
         self.pawn_current_pos = None
         self.pawn_new_pos = None
         self.last_clicked_cell = None
@@ -422,3 +431,17 @@ class Game(MainWindow):
         self.hypoY = None
         self.pawn_new_pos = None
         self.last_clicked_cell = None
+
+    def blink(self):
+        if self.blinking:
+            self.board.canvas.itemconfig(self.selected_pawn.id, state="hidden")
+            self.window.after(250,self.show_pawn)
+
+    def show_pawn(self):
+        if self.selected_pawn is not None:
+            self.board.canvas.itemconfig(self.selected_pawn.id, state="normal")
+            self.window.after(250,self.blink)
+
+    def stop_blink(self):
+        self.blinking = False
+        self.board.canvas.itemconfig(self.selected_pawn.id, state="normal")
