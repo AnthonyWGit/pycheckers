@@ -22,8 +22,10 @@ class MainWindow:
         self.player_color_turn.grid(row=1, column=0)
         self.instruction_label = tk.Label(window, text="Choose a pawn to move") 
         self.instruction_label.grid(row=2, column=0)
+        self.additional_info_capture = tk.Label(window, text="")
+        self.additional_info_capture.grid(row=3, column=0)
         self.button = tk.Button(window, text="Debug cells", command=self.board.log_debug_cells)
-        self.button.grid(row=11, column=0)
+        self.button.grid(row=12, column=0)
         self.button = tk.Button(window, text="Debug Pawns", command=self.board.log_debug_pawns)
-        self.button.grid(row=11, column=1)
+        self.button.grid(row=12, column=1)
 
