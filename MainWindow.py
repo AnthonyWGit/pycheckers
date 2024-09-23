@@ -20,11 +20,13 @@ class MainWindow:
         self.additional_info_capture.grid(row=3, column=0, columnspan=2)
         self.board.canvas.grid(row = 4, column = 0, sticky = "nswe", columnspan= 2, rowspan= 1)
         self.board.canvas.config(highlightthickness=1, highlightbackground='white', relief='ridge', width=240, height=240) # a cell is 30*30 so 8*30
-        self.button = tk.Button(self.main_frame, text="Debug cells", command=self.board.log_debug_cells)
-        self.button.grid(row=12, column=0, columnspan='1', rowspan='1', sticky="w")
-        self.button = tk.Button(self.main_frame, text="Debug Pawns", command=self.board.log_debug_pawns,)
-        self.button.grid(row=12, column=1, columnspan='1', rowspan='1', sticky="e")
-        self.main_frame.config(highlightbackground='grey', highlightthickness='1')
+        self.button1 = tk.Button(self.main_frame, text="Debug cells", command=self.board.log_debug_cells)
+        self.button1.grid(row=12, column=0, columnspan='1', rowspan='1', sticky="w")
+        self.button2 = tk.Button(self.main_frame, text="Debug Pawns", command=self.board.log_debug_pawns,)
+        self.button2.grid(row=12, column=1, columnspan='1', rowspan='1', sticky="e")
+        self.buttonHardReset = tk.Button(self.main_frame, text="Reset")
+        self.buttonHardReset.grid(row=13, column=0, sticky="nswe", columnspan=2)
+        self.main_frame.config(highlightbackground='grey', highlightthickness='1', padx=10, pady=10)
         self.main_frame.grid(sticky='nswe')
         self.main_frame.pack()
 

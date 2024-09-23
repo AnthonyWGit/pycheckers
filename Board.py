@@ -86,3 +86,12 @@ class Board:
     
     def log_debug_pawns(self):
         print(self.pawns)
+
+    def wipeAll(self):
+        #clean all and reset inital state
+        self.canvas.delete("all")
+        self.cells = [[Cell(i, j, 'black' if (i+j)%2 == 0 else 'grey') for j in range(8)] for i in range(8)]
+        self.pawns = []
+        #Redraw
+        self.draw_board()
+        self.start_place_pawns()

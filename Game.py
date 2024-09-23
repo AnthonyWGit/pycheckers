@@ -9,6 +9,7 @@ class Game(MainWindow):
         super().__init__(window)  # Call the constructor of MainWindow
         self.waiting = True
         self.board.canvas.bind("<Button-1>", self.on_click)  # Bind left mouse click event
+        self.buttonHardReset.config(command=self.hard_reset)
         self.pawn_current_pos = None
         self.pawn_new_pos = None
         self.selected_pawn = None
@@ -447,3 +448,23 @@ class Game(MainWindow):
     def stop_blink(self):
         self.blinking = False
         self.board.canvas.itemconfig(self.selected_pawn.id, state="normal")
+
+    def hard_reset(self):
+        self.board.wipeAll()
+        self.board.draw_board()
+        self.board.start_place_pawns()
+        self.waiting = True
+        self.pawn_current_pos = None
+        self.pawn_new_pos = None
+        self.selected_pawn = None
+        self.last_clicked_cell = None
+        self.turn = 1
+        self.turn_color = ''
+        self.direction = ''
+        self.hypoX = None #Used in queen movement
+        self.hypoY = None
+        self.turn_color_set()
+        self.pawnsEncountered = [] # Used in queen movement
+        self.capture = False
+        self.blinking = False
+        self.instruction_label.config(text="Choose a pawn to move") 
