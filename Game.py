@@ -41,7 +41,7 @@ class Game(MainWindow):
         self.turn_color_set()
         self.turn_label.config(text=f'Turn {self.turn}')
         self.instruction_label.config(text=f'Choose a pawn to move')
-        self.additional_info_capture.config(text='')
+        self.additional_info_capture.config(text=f'')
         self.reset_values()
 
     def select_pawn(self):
@@ -49,7 +49,7 @@ class Game(MainWindow):
         if (self.turn % 2 != 0):
             #change label anouncing player turn 
             if (self.last_clicked_cell.free == False and self.last_clicked_cell.pawned.color == 'white'):
-                self.instruction_label.config(text="Choose where you want your pawn to go")
+                self.instruction_label.config(text=f"Choose where you want your pawn to go")
                 self.pawn_current_pos = self.last_clicked_cell
                 self.selected_pawn = self.pawn_current_pos.pawned
                 self.blinking = True
