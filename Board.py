@@ -7,10 +7,8 @@ class Board:
     def __init__(self, window):
         #bord is a Canvas widget from Tkinter class
         self.canvas = tk.Canvas(window, borderwidth=1)
-        self.window = window
         self.last_clicked_cell = None
         #Drawing the grid
-        self.canvas.grid(row = 4, column = 0, sticky = "ew", columnspan= 8, rowspan= 8)
         self.row = 8
         self.col = 8
         #x and y size of square
