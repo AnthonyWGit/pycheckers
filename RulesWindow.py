@@ -6,7 +6,7 @@ class RulesWindow:
         self.window = tk.Toplevel(parent)
         self.window.title("Rules")
         rules = (
-            "1. Each player starts with 8 * 2 pawns.\n"
+            "1. Each player starts with 8 * 3 pawns.\n"
             "2. Pawns can only move diagonally.\n"
             "3. Queens can move through the whole diagonal. \n"
             "4. Pawns can capture opponent's pawns by jumping over them. All 4 directions diagonaly allowed. \n"
