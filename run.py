@@ -1,6 +1,8 @@
 import tkinter as tk
+from MainWindow import MainWindow
 from Game import Game
 
 root = tk.Tk()
-my_game = Game(root)
-my_game.run()
+main_window = MainWindow(root)
+game = Game(main_window)
+main_window.run()

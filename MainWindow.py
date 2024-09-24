@@ -3,7 +3,6 @@ from RulesWindow import RulesWindow
 from AproposWindow import AproposWindow
 from Board import Board
 
-
 class MainWindow:
     def __init__(self, window):
         self.window = window
@@ -60,3 +59,5 @@ class MainWindow:
     def show_apropos(self):
         apropos_window = AproposWindow(self.window)
 
+    def run(self):
+        self.window.mainloop()
