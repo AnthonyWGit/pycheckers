@@ -87,6 +87,16 @@ class Board:
     def log_debug_pawns(self):
         print(self.pawns)
 
+    def countPawnsOnBoard(self):
+        blacks = 0
+        whites = 0
+        for pawn in self.pawns:
+            if pawn.color == "black":
+                blacks += 1 #add 1 to blacks counting value
+            elif pawn.color == "white":
+                whites += 1
+        return blacks,whites #return statement to get our values | python supports returnning multiple values 
+
     def wipeAll(self):
         #clean all and reset inital state
         self.canvas.delete("all")
