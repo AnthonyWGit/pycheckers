@@ -36,6 +36,10 @@ class MainWindow:
         self.menu.add_cascade(label="Menu", menu=self.rules_menu)
         self.rules_menu.add_command(label="Show Rules", command=self.show_rules)
         self.rules_menu.add_command(label="About", command=self.show_apropos)
+        self.replay_menu = tk.Menu(self.menu, tearoff=0)
+        self.menu.add_cascade(label='Replay', menu=self.replay_menu)
+        self.replay_menu.add_command(label='New')
+        self.replay_menu.add_command(label='Load')
         # Center the window : separate function to pack calculations
         self.center_window()
 
