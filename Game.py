@@ -501,8 +501,12 @@ class Game:
             convert_grid = ConvertGrid()
             oldCellInChinook = convert_grid.convert(self.selected_pawn.x, self.selected_pawn.y)
             newCellInChinook = convert_grid.convert(self.last_clicked_cell.x, self.last_clicked_cell.y)
-            with open("replay.pcg","a") as file:
-                file.write(f"{oldCellInChinook}-{newCellInChinook}")
+            if self.capture:
+                with open("replay.pcg","a") as file:
+                    file.write(f"X{oldCellInChinook}-{newCellInChinook},")
+            else:
+                with open("replay.pcg","a") as file:
+                    file.write(f"{oldCellInChinook}-{newCellInChinook},")
 
     def closeFileReplay(self):
         self.replay.close()
