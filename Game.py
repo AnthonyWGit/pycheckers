@@ -1,8 +1,10 @@
 import tkinter as tk
+from tkinter import filedialog
 from MainWindow import MainWindow
 from Cell import Cell
 from Board import Board
 from Pawn import Pawn
+from ConvertGrid import ConvertGrid
 
 class Game:
     def __init__(self, window):
@@ -24,6 +26,10 @@ class Game:
         self.pawnsEncountered = [] # Used in queen movement
         self.capture = False
         self.blinking = False
+        #Replay stuff
+        self.replay = None
+        self.window.replay_menu.entryconfig('New', command=self.newFileReplayInit)
+        self.window.replay_menu.entryconfig('Load', command=self.openFileReplay)
 
     def turn_color_set(self):
         if self.turn % 2 == 0:
@@ -92,6 +98,8 @@ class Game:
                 # Update the old cell
                 old_cell.free = True
                 old_cell.pawned = None
+                #If replay is writting write the move in replay file
+                self.newFileReplayWrite()
                 #selected pawn getting the same coords as the last clicked cell 
                 self.selected_pawn.x = self.last_clicked_cell.x
                 self.selected_pawn.y = self.last_clicked_cell.y
@@ -465,4 +473,39 @@ class Game:
         self.pawnsEncountered = [] # Used in queen movement
         self.capture = False
         self.blinking = False
-        self.window.instruction_label.config(text="Choose a pawn to move") 
+        self.window.instruction_label.config(text="Choose a pawn to move")
+
+    def openFileReplay(self):
+        #Use tkinter filedialog to open explorer to select file 
+        filePath = filedialog.askopenfilename(
+            title="Select a replay file",
+            filetypes=[("PyCheckers Replay File", "*.pcg")]
+        )
+        #if correct file given
+        if filePath:
+            with open(filePath) as file: #with is a manager where Python properly closes the program if error occurs 
+                content = file.read()
+                print('The content:\n', content)
+            self.setReplayToNone() #set to none when file properly closed
+
+    def newFileReplayInit(self):
+        if self.replay is None:
+            with open ("replay.pcg", "w") as file: #a for append w for write 
+                print(f"begin replay")
+                file.write("This is a Pycheckers Replay file - Version 1.0.\n")
+            self.replay = True
+
+    def newFileReplayWrite(self):
+        if self.replay:
+            print(f"{self.selected_pawn.x} ++++++ {self.selected_pawn.y}")
+            convert_grid = ConvertGrid()
+            oldCellInChinook = convert_grid.convert(self.selected_pawn.x, self.selected_pawn.y)
+            newCellInChinook = convert_grid.convert(self.last_clicked_cell.x, self.last_clicked_cell.y)
+            with open("replay.pcg","a") as file:
+                file.write(f"{oldCellInChinook}-{newCellInChinook}")
+
+    def closeFileReplay(self):
+        self.replay.close()
+    
+    def setReplayToNone(self):
+        self.replay = None
