@@ -40,6 +40,7 @@ class MainWindow:
         self.menu.add_cascade(label='Replay', menu=self.replay_menu)
         self.replay_menu.add_command(label='New')
         self.replay_menu.add_command(label='Load')
+        self.replay_menu.add_command(label='Stop')
         # Center the window : separate function to pack calculations
         self.center_window()
 
