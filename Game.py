@@ -30,6 +30,8 @@ class Game:
         self.replay = None
         self.window.replay_menu.entryconfig('New', command=self.newFileReplayInit)
         self.window.replay_menu.entryconfig('Load', command=self.openFileReplay)
+        self.window.replay_menu.entryconfig('Stop', command=self.setReplayToNone)
+        self.lastTurnWhenAPawnWasCaptured = None
 
     def turn_color_set(self):
         if self.turn % 2 == 0:
@@ -116,6 +118,7 @@ class Game:
                     self.soft_reset()
                 #when everything is good increase turn count and clean values
                 if self.capture_additional() == False:
+                    self.didAPlayerWon()
                     self.turn_switch()
             if self.movement_is_valid == False:
                 print('false movement')
@@ -157,6 +160,7 @@ class Game:
                         self.capture = True
                         self.capture_queen(self.hypoX, self.hypoY, direction_label)
                         self.pawn_new_pos = self.last_clicked_cell
+                        self.lastTurnWhenAPawnWasCaptured = self.turn
                         return True
             elif self.last_clicked_cell.free == True and self.last_clicked_cell.color == 'grey' and self.turn_color == 'black':
                 if self.last_clicked_cell.color == 'grey' and self.movement_direction(newX, newY) != None:  # Check if the absolute difference is 1 because queen will be able to go  backwards
@@ -170,6 +174,7 @@ class Game:
                         self.capture = True
                         self.capture_queen(self.hypoX, self.hypoY, direction_label)
                         self.pawn_new_pos = self.last_clicked_cell
+                        self.lastTurnWhenAPawnWasCaptured = self.turn
                         return True
             return False
             
@@ -194,6 +199,7 @@ class Game:
                         if self.board.cells[midX][midY].free != True:
                             self.capture = True
                             self.remove_pawn_from_board(midX, midY)
+                            self.lastTurnWhenAPawnWasCaptured = self.turn
                             return True
                     if newX == 2 and newY == -2:  #Up right movement from whites
                         midX = self.last_clicked_cell.x - 1
@@ -201,6 +207,7 @@ class Game:
                         if self.board.cells[midX][midY].free != True:
                             self.capture = True
                             self.remove_pawn_from_board(midX, midY)
+                            self.lastTurnWhenAPawnWasCaptured = self.turn
                             return True
                 if self.capture == True:
                         if newX == -2 and newY == 2:  #Down left movement from whites 
@@ -224,6 +231,7 @@ class Game:
                         if self.board.cells[midX][midY].free != True:
                             self.capture = True
                             self.remove_pawn_from_board(midX, midY)
+                            self.lastTurnWhenAPawnWasCaptured = self.turn
                             return True
                     if newX == 2 and newY == 2:  #Down right movement from blacks
                         midX = self.last_clicked_cell.x - 1
@@ -231,6 +239,7 @@ class Game:
                         if self.board.cells[midX][midY].free != True:
                             self.capture = True
                             self.remove_pawn_from_board(midX, midY)
+                            self.lastTurnWhenAPawnWasCaptured = self.turn
                             return True
                     if self.capture == True:
                         if newX == -2 and newY == -2:  #Up left movement from blacks
@@ -475,6 +484,16 @@ class Game:
         self.blinking = False
         self.window.instruction_label.config(text="Choose a pawn to move")
 
+    def didAPlayerWon(self):
+        blacks, whites = self.board.countPawnsOnBoard() #You can declare multiple values in on line in Python
+        print(f'{blacks} , {whites}')
+        if blacks == 0:
+            print(f"Whites won !")
+        if whites == 0:
+            print(f"Blacks won !")
+        if self.lastTurnWhenAPawnWasCaptured is not None and (self.turn - self.lastTurnWhenAPawnWasCaptured) == 30:
+            print(f"Draw !")
+
     def openFileReplay(self):
         #Use tkinter filedialog to open explorer to select file 
         filePath = filedialog.askopenfilename(
@@ -507,9 +526,6 @@ class Game:
             else:
                 with open("replay.pcg","a") as file:
                     file.write(f"{oldCellInChinook}-{newCellInChinook},")
-
-    def closeFileReplay(self):
-        self.replay.close()
     
     def setReplayToNone(self):
         self.replay = None
